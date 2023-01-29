@@ -1,0 +1,84 @@
+public class AddTransactionActivity extends AppCompatActivity {
+    ActivityAddTransactionBinding binding;
+    FirebaseFirestore fStore;
+    FirebaseAuth firebaseAuth;
+    FirebaseUser firebaseUser;
+    String type="";
+
+    // Initialize the layout inflater and bind the UI elements
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        binding=ActivityAddTransactionBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+
+        // Get instances of Firebase Firestore, FirebaseAuth and the current Firebase user
+        fStore=FirebaseFirestore.getInstance();
+        firebaseAuth=FirebaseAuth.getInstance();
+        firebaseUser=firebaseAuth.getCurrentUser();
+
+        // Set a click listener for the expense checkbox
+        binding.expenseCheckBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                type = "Expense";
+                binding.expenseCheckBox.setChecked(true);
+                binding.incomeCheckBox.setChecked(false);
+            }
+        });
+
+        // Set a click listener for the income checkbox
+        binding.incomeCheckBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                type="Income";
+                binding.expenseCheckBox.setChecked(false);
+                binding.incomeCheckBox.setChecked(true);
+            }
+        });
+
+        // Set a click listener for the add transaction button
+        binding.btnAddTransaction.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Get the entered amount and note
+                String amount = binding.userAmountAdd.getText().toString().trim();
+                String note = binding.userNoteAdd.getText().toString().trim();
+
+                // Check if amount is entered
+                if (amount.length() <= 0) {
+                    return;
+                }
+
+                // Check if type is selected
+                if (type.length() <= 0) {
+                    Toast.makeText(AddTransactionActivity.this, "Select transaction type", Toast.LENGTH_SHORT).show();
+                }
+
+                // Get the current date and time
+                SimpleDateFormat sdf = new SimpleDateFormat("dd MM yyyy_HH:mm", Locale.getDefault());
+                String currentDateandTime = sdf.format(new Date());
+
+                // Generate a unique ID for the transaction
+                String id = UUID.randomUUID().toString();
+
+                // Create a map of transaction details
+                Map<String,Object> transaction = new HashMap<>();
+                transaction.put("id", id);
+                transaction.put("amount", amount);
+                transaction.put("note", note);
+                transaction.put("type", type);
+                transaction.put("date", currentDateandTime);
+
+                // Store the transaction in the Firestore database
+                fStore.collection("Expense").document(firebaseAuth.getUid()).collection("Notes").document(id)
+                        .set(transaction)
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+@Override
+public void onSuccess(Void unused) {
+Toast.makeText(AddTransactionActivity.this, "Added", Toast.LENGTH_SHORT).show();
+binding.userNoteAdd.setText("");
+binding.userAmountAdd.setText("");
+}
+})
+.addOnFailureListener(new OnFailureListener() {
