@@ -1,0 +1,67 @@
+// SignUpActivity class extends AppCompatActivity
+public class SignUpActivity extends AppCompatActivity {
+    // Object of ActivitySignUpBinding class to access the views
+    ActivitySignUpBinding binding;
+    // Object of FirebaseAuth to handle the firebase authentication
+    FirebaseAuth firebaseAuth ;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // Inflate the layout using data binding
+        binding = ActivitySignUpBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        // Initialize the FirebaseAuth instance
+        firebaseAuth = FirebaseAuth.getInstance();
+
+        // Set onClickListener for the "goToLoginScreen" button
+        binding.goToLoginScreen.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Start the MainActivity on button click
+                Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
+                // Try-catch block to handle any exceptions while starting the activity
+                try {
+                    startActivity(intent);
+                }catch (Exception e){
+                    // handle the exception
+                }
+            }
+        });
+
+        // Set onClickListener for the "btnSignUp" button
+        binding.btnSignUp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Get the email and password from the EditTexts
+                String email=binding.emailForSignup.getText().toString();
+                String password=binding.passwordForSignup.getText().toString();
+                // Check if email and password fields are not empty
+                if (email.trim().length()<=0|| password.trim().length()<=0)
+                {
+                    return;
+                }
+                // Create a new user account with the provided email and password using FirebaseAuth
+                firebaseAuth.createUserWithEmailAndPassword(email,password).addOnSuccessListener(new OnSuccessListener<AuthResult>() {
+                    @Override
+                    public void onSuccess(AuthResult authResult) {
+                        // Show a Toast on successful user creation
+                        Toast.makeText(SignUpActivity.this, "User Created", Toast.LENGTH_SHORT).show();
+
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                // Show a Toast with the exception message on failed user creation
+                                Toast.makeText(SignUpActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+
+                            }
+                        });
+
+            }
+        });
+
+
+
+    }
+}
