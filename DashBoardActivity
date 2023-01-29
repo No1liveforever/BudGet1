@@ -1,0 +1,69 @@
+public class DashboardActivity extends AppCompatActivity {
+    ActivityDashboardBinding binding;
+    FirebaseFirestore firebaseFirestore;
+    FirebaseAuth firebaseAuth;
+    int sumExpense=0 ;
+    int sumIncome=0 ;
+
+    ArrayList<TransactionModel> transactionModelArrayList;
+    TransactionAdapter transactionAdapter;
+
+    //onCreate method is called when the activity is created
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        //Inflate the layout using the ActivityDashboardBinding object
+        binding = ActivityDashboardBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        //Get an instance of FirebaseFirestore for data access
+        firebaseFirestore=FirebaseFirestore.getInstance();
+        //Get an instance of FirebaseAuth for authentication
+        firebaseAuth=FirebaseAuth.getInstance();
+
+        //Initialize the transactionModelArrayList
+        transactionModelArrayList=new ArrayList<>();
+        //Set the layout manager of the historyRecyclerView
+        binding.historyRecyclerView.setLayoutManager (new LinearLayoutManager(this));
+        binding.historyRecyclerView.setHasFixedSize (true);
+        //Set an onClickListener for the addFloatingBtn
+        binding.addFloatingBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    //Start the AddTransactionActivity when addFloatingBtn is clicked
+                    startActivity(new Intent(DashboardActivity.this,AddTransactionActivity.class));
+                }catch (Exception e){
+                    //Catch any exceptions that may occur
+                }
+            }
+        });
+        //Load the transaction data
+        loadData();
+    }
+
+    //Method to load the transaction data
+    private void loadData() {
+        //Get the Notes collection of the Expenses document, which is specific to the current user
+        firebaseFirestore.collection("Expenses").document(firebaseAuth.getUid()).collection("Notes")
+            .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                    for (DocumentSnapshot ds: task.getResult()) {
+                        //Create a TransactionModel object for each transaction
+                        TransactionModel model=new TransactionModel(
+                            ds.getString("id"),
+                            ds.getString("note"),
+                            ds.getString("amount"),
+                            ds.getString("type"),
+                            ds.getString("date"));
+
+                        //Add the TransactionModel object to the transactionModelArrayList
+                        transactionModelArrayList.add(model);
+                    }
+                    //Create a TransactionAdapter and set it as the adapter for the historyRecyclerView
+                    transactionAdapter=new TransactionAdapter(DashboardActivity.this, transactionModelArrayList);
+                    binding.historyRecyclerView.setAdapter(transactionAdapter);
+                }
+            });
+    }
+}
