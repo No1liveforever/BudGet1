@@ -23,6 +23,8 @@ public class DashboardActivity extends AppCompatActivity {
     ActivityDashboardBinding binding;
     FirebaseFirestore firebaseFirestore;
     FirebaseAuth firebaseAuth;
+    int sumExpense=0 ;
+    int sumIncome=0 ;
 
     ArrayList<TransactionModel> transactionModelArrayList;
     TransactionAdapter transactionAdapter;
@@ -64,6 +66,7 @@ public class DashboardActivity extends AppCompatActivity {
                             ds.getString(  "amount"),
                             ds.getString(  "type"),
                             ds.getString(  "date"));
+
                             transactionModelArrayList.add(model);
                        }
 

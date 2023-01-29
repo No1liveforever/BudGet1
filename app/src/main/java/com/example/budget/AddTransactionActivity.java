@@ -16,7 +16,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
@@ -70,13 +73,17 @@ public class AddTransactionActivity extends AppCompatActivity {
                     Toast.makeText(AddTransactionActivity.this, "Select transaction type", Toast.LENGTH_SHORT).show();
                 }
 
+                SimpleDateFormat sdf = new SimpleDateFormat("dd MM yyyy_HH:mm", Locale.getDefault());
+                String currentDateandTime = sdf.format(new Date());
+
+
                 String id = UUID.randomUUID().toString();
-                Map<String, Object> transaction = new HashMap<>();
+                Map<String,Object> transaction = new HashMap<>();
                 transaction.put("id", id);
                 transaction.put("amount", amount);
                 transaction.put("note", note);
                 transaction.put("type", type);
-                transaction.put("date","23 july 2021");
+                transaction.put("date","CurrentDateandTime");
 
                 fStore.collection("Expense").document(firebaseAuth.getUid()).collection("Notes").document(id)
                         .set(transaction)
@@ -85,7 +92,7 @@ public class AddTransactionActivity extends AppCompatActivity {
                             public void onSuccess(Void unused) {
                                 Toast.makeText(AddTransactionActivity.this, "Added", Toast.LENGTH_SHORT).show();
                                 binding.userNoteAdd.setText("");
-                                binding.userAmountAdd.setText(" ");
+                                binding.userAmountAdd.setText("");
 
                             }
                         })
