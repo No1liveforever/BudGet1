@@ -1,0 +1,68 @@
+// MainActivity class extends AppCompatActivity and implements the FirebaseAuth
+public class MainActivity extends AppCompatActivity {
+    // Object of ActivityMainBinding class to access the views
+    ActivityMainBinding binding;
+    // Object of FirebaseAuth to handle the firebase authentication
+    FirebaseAuth firebaseAuth;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // Inflate the layout using data binding
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+
+        // Initialize the FirebaseAuth instance
+        firebaseAuth=FirebaseAuth.getInstance();
+
+        // Set onClickListener for the "goToSignUpScreen" button
+        binding.goToSignUpScreen.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Start the SignUpActivity on button click
+                Intent intent = new Intent(MainActivity.this,SignUpActivity.class);
+                // Try-catch block to handle any exceptions while starting the activity
+                try {
+                    startActivity(intent);
+                }catch (Exception e){
+                    // handle the exception
+                }
+            }
+        });
+
+        // Set onClickListener for the "btnLogin" button
+        binding.btnLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Get the email and password from the EditTexts
+                String email=binding.emailLogin.getText().toString().trim();
+                String password=binding.passwordLogin.getText().toString().trim();
+                // Check if email and password fields are not empty
+                if (email.length()<=0 || password.length()<=0){
+                    return;
+                }
+                // Sign in with the provided email and password using FirebaseAuth
+                firebaseAuth.signInWithEmailAndPassword(email,password)
+                        .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
+                            @Override
+                            public void onSuccess(AuthResult authResult) {
+                                // Start the DashboardActivity on successful login
+                                try {
+                                    startActivity(new Intent(MainActivity.this , DashboardActivity.class));
+                                }catch (Exception e){
+                                    // handle the exception
+                                }
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                // Show a Toast with the exception message on failed login
+                                Toast.makeText(MainActivity.this, e.getMessage() , Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
+            }
+        });
+    }
+}
