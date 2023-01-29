@@ -1,0 +1,70 @@
+// TransactionAdapter class extends RecyclerView.Adapter to provide a view holder to display the data 
+public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.MyViewHolder> {
+
+    // Context to be used in the adapter
+    Context context;
+    // ArrayList of TransactionModel to store the data
+    ArrayList<TransactionModel> transactionModelArrayList;
+
+    // Constructor to initialize the values of context and ArrayList of TransactionModel
+    public TransactionAdapter(Context context, ArrayList<TransactionModel> transactionModelArrayList) {
+        this.context = context;
+        this.transactionModelArrayList = transactionModelArrayList;
+    }
+
+    // onCreateViewHolder is called when the ViewHolder is created.
+    // Returns an instance of MyViewHolder
+    @NonNull
+    @Override
+    public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        // Inflates the view using LayoutInflater.from and returns an instance of MyViewHolder.
+        View view= LayoutInflater.from (parent.getContext()).inflate(R.layout.one_recycler_item, parent, false);
+        return new MyViewHolder (view);
+    }
+
+    // onBindViewHolder binds the data to the ViewHolder
+    @Override
+    public void onBindViewHolder (@NonNull TransactionAdapter.MyViewHolder holder, int position) {
+        // Get the data from the TransactionModel array list
+        TransactionModel model=transactionModelArrayList.get(position);
+        // Get the type of transaction from the TransactionModel
+        String priority = model.getType();
+        // Check the type of transaction and set the background color
+        if(priority.equals("Expense")){
+            holder.priority.setBackgroundResource(R.drawable.red_shape);
+
+        }
+        else {
+            holder.priority.setBackgroundResource(R.drawable.green_shape);
+
+        }
+        // Set the text of amount, date and note
+        holder.amount.setText (model.getAmount());
+        holder.date.setText (model.getDate());
+        holder.note.setText (model.getNote());
+    }
+
+    // getItemCount returns the number of items in the ArrayList of TransactionModel
+    @Override
+    public int getItemCount() {
+        return transactionModelArrayList.size();
+    }
+
+    // MyViewHolder is an inner class to hold the references to the Views in the RecyclerView item
+    public class MyViewHolder extends RecyclerView.ViewHolder {
+        // TextView references for note, amount, date
+        TextView note, amount, date;
+        // View reference for priority
+        View priority;
+        // Constructor for MyViewHolder
+        public MyViewHolder (@NonNull View itemView) {
+            super(itemView);
+            // Initialize the references to the Views
+            note=itemView.findViewById(R.id.note_one);
+            amount=itemView.findViewById(R.id.amount_one);
+            date=itemView.findViewById(R.id.date_one);
+            priority=itemView.findViewById(R.id.priority_one);
+        }
+    }
+
+}
